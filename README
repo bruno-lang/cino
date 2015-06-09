@@ -33,4 +33,7 @@ Word               $ show
 
 ASCII control codes and whitespace are no-ops.
 load 2 byte index via first byte with MSB 1.
+a-z, A-Z at start of line mark their target index.
+0-9 at start of line mark exception handler index.
+
 
