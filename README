@@ -15,7 +15,7 @@ Math     Flow      Loop     Vector     Load
 /  div   .  goto    & pair   ; ins   
          ?  test    | each   = clone   Index
 \        ,  break   \ thru   ' copy    a-z = `:
- % mod   !  raise   / merge  : cat     A-Z = `
+ ~ mod   !  raise   / merge  : cat     A-Z = `
  
 Shift    Comp      Lookup    Msg       Process
 \        =  eq     [         #         #
