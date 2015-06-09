@@ -19,12 +19,12 @@ Math     Flow      Loop     Vector     Load
  
 Shift    Comp      Lookup    Msg       Process
 \        =  eq     [         #         #
- < shl   <  lt      ? find    > send    + spawn
- > shr   >  gt      # cnt     < rec     - die
+ < shl   <  lt      < get     < rec     + spawn
+ > shr   >  gt      > set     > send    - die
  \ rol   {  le      ~ match   } next    ~ coop
- / ror   }  ge                { pick    = fork
-         ]  bet.   Misc 
-Word               $ show
+ / ror   }  ge      ? find    { pick    = fork
+         ]  bet.    # cnt              $ show
+Word               
 \                            V-stack   Memory    
  + int   Logic     W-Stack   [         @         
  - uint  &  and    ^  dup     ^ dup     + alloc  
@@ -35,5 +35,3 @@ ASCII control codes and whitespace are no-ops.
 load 2 byte index via first byte with MSB 1.
 a-z, A-Z at start of line mark their target index.
 0-9 at start of line mark exception handler index.
-
-
