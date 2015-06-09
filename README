@@ -4,7 +4,9 @@
 /    |  / |/ |  /  \_
 \___/|_/  |  |_/\__/ 
                      
-a interpreted intermediate language and VM  
+  a interpreted intermediate language and VM  
+
+              "Hello, World"$
 
 math     flow      loop      vector    load
 +  add   :  call   [         [         ' <word> ' 
@@ -27,3 +29,4 @@ logic    stack      [         @         $ show
 &  and   ^  dup      ^ dup     + alloc
 |  or    _  drop     _ drop    < read
 ~  not   %  swap     % swap    > write
+
