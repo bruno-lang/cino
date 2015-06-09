@@ -8,25 +8,26 @@
 
               "Hello, World"$
 
-math     flow     loop      vector     load
-+  add   :  call  [         [          ' <word> ' 
+Math     Flow      Loop     Vector     Load
++  add   :  call   [        [          ' <word> ' 
 -  sub   ;  ret    . over    + init    " <vect> "
 *  mul   `  mark    ( scan   , cons    0-9 = 'n'
 /  div   .  goto    & pair   ; ins   
-         ?  test    | each   = clone   index
+         ?  test    | each   = clone   Index
 \        ,  break   \ thru   ' copy    a-z = `:
  % mod   !  raise   / merge  : cat     A-Z = `
  
-shift    comp      search    msg       process
+Shift    Comp      Lookup    Msg       Process
 \        =  eq     [         #         #
  < shl   <  lt      ? find    > send    + spawn
  > shr   >  gt      # cnt     < rec     - die
  \ rol   {  le      ~ match   } next    ~ coop
  / ror   }  ge                { pick    = fork
          ]  bet.   
-                   v-stack   memory    misc
-logic    stack     [         @         $  show
+                   V-stack   Memory    Misc
+Logic    Stack     [         @         $  show
 &  and   ^  dup     ^ dup     + alloc  \n noop  
 |  or    _  drop    _ drop    < read   \t noop
 ~  not   %  swap    % swap    > write     noop
 
+load 2 byte index via first byte with MSB 1.
