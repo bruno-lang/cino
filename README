@@ -13,20 +13,20 @@ math     flow      loop      vector    load
 -  sub   ;  ret     . over    + init   " <vect> "
 *  mul   `  mark     ( scan   , cons   0-9 = 'n'
 /  div   .  goto     & pair   ; ins   
-         ?  test     | each   = clone   index
-\        ,  break    \ thru   ' copy    a-z = `:
- % mod   !  raise    / merge  : cat     A-Z = `
+         ?  test     | each   = clone  index
+\        ,  break    \ thru   ' copy   a-z = `:
+ % mod   !  raise    / merge  : cat    A-Z = `
  
-shift    comp       search    msg       process
-\        =  eq      [         #         #
- < shl   <  lt       ? find    > send    + spawn
- > shr   >  gt       # cnt     < rec     - die
- \ rol   {  le       ~ match   } next    ~ coop
- / ror   }  ge                 { pick    = fork
+shift    comp       search    msg      process
+\        =  eq      [         #        #
+ < shl   <  lt       ? find    > send   + spawn
+ > shr   >  gt       # cnt     < rec    - die
+ \ rol   {  le       ~ match   } next   ~ coop
+ / ror   }  ge                 { pick   = fork
          ]  bet.    
-                    v-stack   memory    misc
-logic    stack      [         @         $ show
-&  and   ^  dup      ^ dup     + alloc
-|  or    _  drop     _ drop    < read
-~  not   %  swap     % swap    > write
+                    v-stack   memory   misc
+logic    stack      [         @        $  show
+&  and   ^  dup      ^ dup     + alloc \n noop  
+|  or    _  drop     _ drop    < read  \t noop
+~  not   %  swap     % swap    > write    noop
 
