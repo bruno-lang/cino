@@ -26,7 +26,7 @@ Shift    View      Lookup    Cmp       Msg
  / ror    \ drop    ? find   } ge       } next   
           ~ span    ~ match  ] bet
                                        Process   Arithmetic 
-         V-stack   Bounds       Logic     #      \
+         V-stack   Bounds    Logic     #         \
 W-stack  [         (         &  and     + spawn   + uint  
 ^  dup    ^ vdup    ? len    |  or      - die     - int
 _  drop   _ vdrop   [ left   ~  not     & coop    . dec 
