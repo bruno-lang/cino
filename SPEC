@@ -105,7 +105,7 @@ Vector
 [:	cat		.-.-=D++P
 [,	cons	?
 [;	ins		.=D++P
-@+	map		.L.R--LR+=D++P
+[@	map		.L.R--LR+=D++P
 
 View
 (/	take	.-R.=D++P
@@ -127,10 +127,19 @@ Process
 #+	spawn	.-D++P
 #-	die		
 #&	coop	.-T
-#|	fork	.-T++P ???more
+#|	fork	.-T++P ???
 
 Misc
 $	show	.-D+P
+
+Flow
+:	call	.-T+=T=P
+;	ret		.-T=P
+.	goto	.T=P
+@	mark	+=T+P
+?	test	.-R=P
+,	break	-T+P
+!	raise	.-*T-*D-*LR=P
 
 Word
 \+	uint	++P

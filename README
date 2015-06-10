@@ -11,8 +11,8 @@
 Math     Vector    Loop      Flow      Load
 +  add   [         [         :  call   ' <word> '
 -  sub    + init    . over   ;  ret    " <vect> "
-*  mul    * copy    ! scan   @  mark   0-9 = 'n'^
-/  div    : cat     & pair   .  goto   a-z = @:     
+*  mul    * copy    ! scan   .  goto   0-9 = 'n'^
+/  div    : cat     & pair   @  mark   a-z = @:     
 \         , cons    | each   ?  test   A-Z = @
  ~ mod    ; ins     \ thru   ,  break  
  { min    @ map     / merge  !  raise  Misc
