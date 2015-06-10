@@ -8,30 +8,34 @@
 
               "Hello, World"$
 
-Math     Flow      Loop     Vector     Load
-+  add   :  call   [        [          ' <word> '
--  sub   ;  ret     . over   + init    " <vect> "
-*  mul   `  mark    ( scan   , cons    0-9 = 'n'^
-/  div   .  goto    & pair   ; ins   
-         ?  test    | each   = clone   Index
-\        ,  break   \ thru   ' copy    a-z = `:
- ~ mod   !  raise   / merge  : cat     A-Z = `
- 
-Shift    Comp      Lookup    Msg       Memory
-\        =  eq     [         #         @
- < shl   <  lt      < get     < rec     < read
- > shr   >  gt      > set     > send    > write
- \ rol   {  le      ~ match   { pick    + map
- / ror   }  ge      ? find    } next   
-         ]  bet.    # cnt              Misc
-Word                         Process   $ show
-\        Logic     V-stack   #
- + uint  &  and    [          + spawn  W-stack
- - int   |  or      ^ dup     - die    ^  dup
- . dec   ~  not     _ drop    ~ coop   _  drop
- % frac  \| xor     % swap    = fork   %  swap
+Math     Vector    Loop      Flow      Load
++  add   [         [         :  call   ' <word> '
+-  sub    + init    . over   ;  ret    " <vect> "
+*  mul    * copy    ! scan   @  mark   0-9 = 'n'^
+/  div    : cat     & pair   .  goto   a-z = @:     
+\         , cons    | each   ?  test   A-Z = @
+ ~ mod    ; ins     \ thru   ,  break  
+ { min    @ map     / merge  !  raise  Misc
+ } max                                 $ show
+
+Shift    View      Lookup    Cmp       Msg       
+\        (         [         = eq      #         
+ < shl    < movel   < get    < lt       < rec    
+ > shr    > movr    > set    > gt       > send   
+ \ rol    / take    # cnt    { le       { pick   
+ / ror    \ drop    ? find   } ge       } next   
+          ~ span    ~ match  ] bet
+                                       Process   Arithmetic 
+         V-stack   Bounds       Logic     #      \
+W-stack  [         (         &  and     + spawn   + uint  
+^  dup    ^ vdup    ? len    |  or      - die     - int
+_  drop   _ vdrop   [ left   ~  not     & coop    . dec 
+%  swap   % vswap   ] right  `  xor     | fork    % frac 
 
 ASCII control codes and whitespace are no-ops.
 load 2 byte index via first byte with MSB 1.
 a-z, A-Z at start of line mark their target index.
 0-9 at start of line mark exception handler index.
+
+
+
