@@ -10,11 +10,11 @@
 a process
 =========
 
-	   component         "pointer to"		 "pointer to"
-	WS Word-Stack		L Left operand		R Right operand
-	VS Vector-Stack		D Dataset
-	IS Index-Stack		T Target
-	PB Program Buffer	P Position "PC"
+      component         "pointer to"        "pointer to"
+   WS Word-Stack       L Left operand      R Right operand
+   VS Vector-Stack     D Dataset
+   IS Index-Stack      T Target
+   PB Program Buffer   P Position "PC"
 __________________________________________
 
 WS ::LR
@@ -29,120 +29,123 @@ ___________________________________________
 instructions
 ============
 
-	. read from
-	= write to
-	+ inc
-	- dec
+   . read from
+   = write to
+   + inc
+   - dec
 
-	* left hand modification multiple times
+   * left hand modification multiple times
 
-when		than
-
+when      than
+___________________________
 Math
-+	add		.L.R=L+P
--	sub		.L.R=L+P
-*	mul		.L.R=L+P
-/	div		.L.R=L+P
-\~	mod		.L.R=L++P
-\{	min		.L.R=L++P
-\}	max		.L.R=L++P
++   add    .L.R=L+P
+-   sub    .L.R=L+P
+*   mul    .L.R=L+P
+/   div    .L.R=L+P
+\~  mod    .L.R=L++P
+\{  min    .L.R=L++P
+\}  max    .L.R=L++P
 
 Shift
-\<	shl		.L.R=L++P
-\>	shr		.L.R=L++P
-\\	rol		.L.R=L++P
-\/	ror		.L.R=L++P
+\<  shl    .L.R=L++P
+\>  shr    .L.R=L++P
+\\  rol    .L.R=L++P
+\/  ror    .L.R=L++P
 
 Logic
-&	and		.L.R=L+P
-|	or		.L.R=L+P
-~	not		.R=R+P
-\|	xor		.L.R=L++P
+&   and    .L.R=L+P
+|   or     .L.R=L+P
+~   not    .R=R+P
+\|  xor    .L.R=L++P
 
 Cmp
-=	eq		.L.R=R+P
-<	lt		.L.R=R+P
->	gt		.L.R=R+P
-{	le		.L.R=R+P
-}	ge		.L.R=R+P
-]	bet		.L.R=L-LR+P
-
-Load
-'	word	=R+*P
-"	vec		+=D+*P
-0-9	const	+=R+P
-A-Z fun		+=T+P
-a-z	macro	+=T=P
-
-W-stack
-^	dup		+LR=R+P
-_	down	-LR+P
-%	swap	=L=R+P
-
-V-stack
-[^	vdup	+=D++P
-[_	vdown	-D++P
-[%	vswap	=D=VS++P
-
-Loop
-[.	over	.T.D=R++P
-[!	scan	.T.R.=D++P
-[&	pair	.T.R.=D++P
-[|	each	.T.R.=D++P
-[\	thru	.T.=D++P
-[/	merge	.T.=D++P
-
-Lookup
-[<	get		.D=R++P
-[>	set		.R=D++P
-[~	match	.T.D.=R++P
-[?	find	.D.=R++P
-[#	cnt		.T.D=R++P
-
-Vector
-[+	init	.-R+=D++P
-[*	copy	+=D++P
-[:	cat		.-.-=D++P
-[,	cons	?
-[;	ins		.=D++P
-[@	map		.L.R--LR+=D++P
-
-View
-(/	take	.-R.=D++P
-(\	drop	.-R.=D++P
-(<	movl	.-R.=D++P
-(>	movr	.-R.=D++P
-(~	span	.-R.=D++P
-(?	len		.D=R++P
-([	left	.D=R++P
-(]	right	.D=R++P
-
-Msg
-#<	rec		.=D++P
-#>	send	.-.-D++P
-#{	pick	.-R(.-)*+=D++P
-#}	next	.-R(.-)*++P
-
-Process
-#+	spawn	.-D++P
-#-	die		
-#&	coop	.-T
-#|	fork	.-T++P ???
-
-Misc
-$	show	.-D+P
+=   eq     .L.R=R+P
+<   lt     .L.R=R+P
+>   gt     .L.R=R+P
+{   le     .L.R=R+P
+}   ge     .L.R=R+P
+]   bet    .L.R=L-LR+P
 
 Flow
-:	call	.-T+=T=P
-;	ret		.-T=P
-.	goto	.T=P
-@	mark	+=T+P
-?	test	.-R=P
-,	break	-T+P
-!	raise	.-*T-*D-*LR=P
+:   call   .-T+=T=P
+;   ret    .-T=P
+.   goto   .T=P
+@   mark   +=T+P
+?   test   .-R=P
+,   break  -T+P
+!   raise  .-*T-*D-*LR=P
 
-Arithmetic
-\+	uint	++P
-\-	int		++P
-\.	dec		++P
-\%	frac	++P
+Load
+'   word   =R+*P
+"   vec    +=D+*P
+0-9 const  +=R+P
+A-Z fun    +=T+P
+a-z macro  +=T=P
+
+W-stack
+^   dup    +LR=R+P
+_   sag    -LR+P
+%   swap   =L=R+P
+
+V-stack
+[^  vdup   +=D++P
+[_  vdsag  -D++P
+[%  vswap  =D=VS++P
+
+Loop
+[.  over   .T.D=R++P
+[!  scan   .T.R.=D++P
+[&  pair   .T.R.=D++P
+[|  each   .T.R.=D++P
+[\  thru   .T.=D++P
+[/  merge  .T.=D++P
+
+Lookup
+[<  get    .D=R++P
+[>  set    .R=D++P
+[~  match  .T.D.=R++P
+[?  find   .D.=R++P
+[#  cnt    .T.D=R++P
+
+Vector
+[+  init   .-R+=D++P
+[*  copy   +=D++P
+[:  cat    .-.-=D++P
+[,  cons   ?
+[;  ins    .=D++P
+[@  map    .L.R--LR+=D++P
+
+View
+(/  take   .-R.=D++P
+(\  drop   .-R.=D++P
+(<  movl   .-R.=D++P
+(>  movr   .-R.=D++P
+(~  span   .-R.=D++P
+
+Bounds
+(?  len    .D=R++P
+([  left   .D=R++P
+(]  right  .D=R++P
+
+Msg
+#<  rec    .=D++P
+#>  send   .-.-D++P
+#{  pick   .-R(.-)*+=D++P
+#}  next   .-R(.-)*++P
+
+Process
+#+  spawn  .-D++P
+#-  die      
+#&  coop   .-T
+#|  fork   .-T++P ???
+
+Misc
+$   show   .-D+P
+
+Arithm
+\+  uint   ++P
+\-  int    ++P
+\.  dec    ++P
+\%  frac   ++P
+

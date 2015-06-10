@@ -34,7 +34,7 @@ Arithm   Bounds    Process   Logic     Misc
          V-stack   	
 W-stack  [         
 ^  dup    ^ vdup   
-_  down   _ vdown  
+_  sag    _ vsag
 %  swap   % vswap   
 
 ASCII control codes and whitespace are no-ops.
