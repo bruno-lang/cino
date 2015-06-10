@@ -12,25 +12,30 @@ Math     Vector    Loop      Flow      Load
 +  add   [         [         :  call   ' <word> '
 -  sub    + init    . over   ;  ret    " <vect> "
 *  mul    * copy    ! scan   .  goto   0-9 = 'n'^
-/  div    : cat     & pair   @  mark   a-z = @:     
-\         , cons    | each   ?  test   A-Z = @
- ~ mod    ; ins     \ thru   ,  break  
- { min    @ map     / merge  !  raise  Misc
- } max                                 $ show
+/  div    : cat     & pair   @  mark   
+\~ mod    , cons    | each   ?  test   Index
+\{ min    ; ins     \ thru   ,  break  a-z = @:
+\} max    @ map     / merge  !  raise  A-Z = @
 
-Shift    View      Lookup    Cmp       Msg       
-\        (         [         = eq      #         
- < shl    < movel   < get    < lt       < rec    
- > shr    > movr    > set    > gt       > send   
- \ rol    / take    # cnt    { le       { pick   
- / ror    \ drop    ? find   } ge       } next   
-          ~ span    ~ match  ] bet
-                                       Process   Arithmetic 
-         V-stack   Bounds    Logic     #         \
-W-stack  [         (         &  and     + spawn   + uint  
-^  dup    ^ vdup    ? len    |  or      - die     - int
-_  drop   _ vdrop   [ left   ~  not     & coop    . dec 
-%  swap   % vswap   ] right  `  xor     | fork    % frac 
+Shift    View      Msg       Cmp       Lookup
+\        (         #         = eq      [    
+ < shl    < movel   < rec    < lt       < get
+ > shr    > movr    > send   > gt       > set
+ \ rol    / take    # pick   { le       { cnt
+ / ror    \ drop    ? next   } ge       } find
+          ~ span             ] bet      ~ match
+                                 
+Arithm   Bounds    Process   Logic     Misc
+\        (         #         &  and    $ show 
+ + uint   ? len     + spawn  |  or
+ - int    [ left    - die    ~  not
+ . dec    ] right   & coop   `  xor
+ % frac             | fork
+		 V-stack   	
+W-stack  [         
+^  dup    ^ vdup   
+_  down   _ vdown  
+%  swap   % vswap   
 
 ASCII control codes and whitespace are no-ops.
 load 2 byte index via first byte with MSB 1.

@@ -76,12 +76,12 @@ a-z	macro	+=T=P
 
 W-stack
 ^	dup		+LR=R+P
-_	drop	-LR+P
+_	down	-LR+P
 %	swap	=L=R+P
 
 V-stack
 [^	vdup	+=D++P
-[_	vdrop	-D++P
+[_	vdown	-D++P
 [%	vswap	=D=VS++P
 
 Loop
@@ -141,7 +141,7 @@ Flow
 ,	break	-T+P
 !	raise	.-*T-*D-*LR=P
 
-Word
+Arithmetic
 \+	uint	++P
 \-	int		++P
 \.	dec		++P
