@@ -31,7 +31,7 @@ Arithm   Bounds    Process   Logic     Misc
  - int    [ left    - die    ~  not
  . dec    ] right   & coop   `  xor
  % frac             | fork
-		 V-stack   	
+         V-stack   	
 W-stack  [         
 ^  dup    ^ vdup   
 _  down   _ vdown  
