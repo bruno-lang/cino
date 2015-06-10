@@ -9,21 +9,22 @@
 
 a process
 =========
-
-      component         "pointer to"        "pointer to"
-   WS Word-Stack       L Left operand      R Right operand
-   VS Vector-Stack     D Dataset
-   IS Index-Stack      T Target
-   PB Program Buffer   P Position "PC"
-__________________________________________
+_______________________________________
 
 WS ::LR
 VS ::::::D
 
 IS ::T
-PB :::::::::::::::P:::::::~/~::::::::::::::
-___________________________________________
-0 --> top                           2^16-1
+PB :::::::::::::::P:::::::~/~::::::::::
+_______________________________________
+0 --> top                        2^16-1
+
+      component         "pointer to" 
+   WS Word-Stack       L Left operand
+                       R Right operand      
+   VS Vector-Stack     D Dataset
+   IS Index-Stack      T Target
+   PB Program Buffer   P Position "PC"
 
 
 instructions
@@ -34,10 +35,10 @@ instructions
    + inc
    - dec
 
-   * left hand modification multiple times
+   * left hand mod multiple times
 
 when      than
-___________________________
+_______________________________________
 Math
 +   add    .L.R=L+P
 -   sub    .L.R=L+P
