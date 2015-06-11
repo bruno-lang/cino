@@ -9,35 +9,43 @@
 
 a process
 =========
-_______________________________________
+________________[data]_________________
 
 WS ::LR
 VS ::::::D
+________________[flow]_________________
 
 IS ::T
-PB :::::::::::::::P:::::::~/~::::::::::
+PB :::::::::::::::P::::::::::::~/~:::::
+
+________________[maps]_________________
+
+NI abcdefghijklmnopqrstuvwxyz
+NI ABCDEFGHIJKLMNOPQRSTUVWXYZ
+EH 0123456789
 _______________________________________
-0 --> top                        2^16-1
+   0 --> top                     2^16-1
 
-      component         "pointer to" 
-   WS Word-Stack       L Left operand
-                       R Right operand      
-   VS Vector-Stack     D Dataset
-   IS Index-Stack      T Target
-   PB Program Buffer   P Position "PC"
-
+     component         "pointer to" 
+  WS Word-Stack       L Left operand
+                      R Right operand      
+  VS Vector-Stack     D Dataset
+  IS Index-Stack      T Target
+  PB Program Buffer   P Position "PC"
+  NI Named Index
+  EH Exception Handler
 
 instructions
 ============
 
-   . read from
-   = write to
-   + inc
-   - dec
+  . read from
+  = write to
+  + inc
+  - dec
 
-   * left hand mod multiple times
+  * left hand mod multiple times
 
-when      than
+when       than --> sequence
 _______________________________________
 Math
 +   add    .L.R=L+P
@@ -58,7 +66,7 @@ Logic
 &   and    .L.R=L+P
 |   or     .L.R=L+P
 ~   not    .R=R+P
-\|  xor    .L.R=L++P
+`   xor    .L.R=L++P
 
 Cmp
 =   eq     .L.R=R+P
