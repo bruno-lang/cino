@@ -11,7 +11,7 @@
 Math     Vector    Loop      Flow      Load
 +  add   [         [         :  call   ' <word> '
 -  sub    + init    . over   ;  ret    " <vect> "
-*  mul    * copy    ! scan   .  goto   0-9 = 'n'^
+*  mul    * copy    ! scan   .  goto   0-9 = 'n'
 /  div    : cat     & pair   @  mark   
 \~ mod    , cons    | each   ?  test   Index
 \{ min    ; ins     \ thru   ,  break  a-z = @:
@@ -23,7 +23,7 @@ Shift    View      Msg       Cmp       Lookup
  > shr    > movr    > send   > gt       > set
  \ rol    / take    # pick   { le       { cnt
  / ror    \ drop    ? next   } ge       } find
-          ~ span             ] bet      ~ match
+          ~ span             ] in       ~ match
                                  
 Arithm   Bounds    Process   Logic     Misc
 \        (         #         &  and    $ show 

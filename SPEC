@@ -35,6 +35,8 @@ _______________________________________
   NI Named Index
   EH Exception Handler
 
+
+
 instructions
 ============
 
@@ -81,9 +83,9 @@ Flow
 ;   ret    .-T=P
 .   goto   .T=P
 @   mark   +=T+P
-?   test   .-R=P
 ,   break  -T+P
-!   raise  .-*T-*D-*LR=P
+!   raise  .R-*T-*D-*LR=P
+?   test   .-R=P
 
 Load
 '   word   =R+*P
@@ -102,7 +104,7 @@ V-stack
 [_  vdsag  -D++P
 [%  vswap  =D=VS++P
 
-Loop
+Loopl
 [.  over   .T.D=R++P
 [!  scan   .T.R.=D++P
 [&  pair   .T.R.=D++P
