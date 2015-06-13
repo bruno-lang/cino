@@ -76,14 +76,14 @@ Cmp
 >   gt     .L.R=R+P
 {   le     .L.R=R+P
 }   ge     .L.R=R+P
-]   bet    .L.R=L-LR+P
+,   bet    .L.R=L-LR+P
 
 Flow
 :   call   .-T+=T=P
 ;   ret    .-T=P
 .   goto   .T=P
-@   mark   +=T+P
-,   break  -T+P
+(   mark   +=T+P
+)   break  -T+P
 !   raise  .R-*T-*D-*LR=P
 ?   test   .-R=P
 
@@ -128,16 +128,16 @@ Vector
 [@  map    .L.R--LR+=D++P
 
 View
-(/  take   .-R.=D++P
-(\  drop   .-R.=D++P
-(<  movl   .-R.=D++P
-(>  movr   .-R.=D++P
-(~  span   .-R.=D++P
+]/  take   .-R.=D++P
+]\  drop   .-R.=D++P
+]<  movl   .-R.=D++P
+]>  movr   .-R.=D++P
+]~  span   .-R.=D++P
 
 Bounds
-(?  len    .D=R++P
-([  left   .D=R++P
-(]  right  .D=R++P
+]?  len    .D=R++P
+][  left   .D=R++P
+]]  right  .D=R++P
 
 Msg
 #<  rec    .=D++P

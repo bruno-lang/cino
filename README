@@ -12,21 +12,21 @@ Math     Vector    Loop      Flow      Load
 +  add   [         [         :  call   ' <word> '
 -  sub    + init    . over   ;  ret    " <vect> "
 *  mul    * copy    ! scan   .  goto   0-9 = 'n'
-/  div    : cat     & pair   @  mark   
+/  div    : cat     & pair   (  mark   
 \~ mod    , cons    | each   ?  test   Index
-\{ min    ; ins     \ thru   ,  break  a-z = @:
-\} max    @ map     / merge  !  raise  A-Z = @
+\{ min    ; ins     \ thru   )  break  a-z = (:
+\} max    @ map     / merge  !  raise  A-Z = (
 
 Shift    View      Msg       Cmp       Lookup
-\        (         #         = eq      [    
+\        ]         #         = eq      [    
  < shl    < movel   < rec    < lt       < get
  > shr    > movr    > send   > gt       > set
  \ rol    / take    # pick   { le       { cnt
  / ror    \ drop    ? next   } ge       } find
-          ~ span             ] in       ~ match
+          ~ span             , in       ~ match
                                  
 Arithm   Bounds    Process   Logic     Misc
-\        (         #         &  and    $ show 
+\        ]         #         &  and    $ show 
  + uint   ? len     + spawn  |  or
  - int    [ left    - die    ~  not
  . dec    ] right   & coop   `  xor
@@ -42,5 +42,6 @@ load 2 byte index via first byte with MSB 1.
 a-z, A-Z at start of line mark their target index.
 0-9 at start of line mark exception handler index.
 
+@
 
 

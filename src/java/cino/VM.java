@@ -124,13 +124,13 @@ public class VM {
 			case '>' : r=l> r?1:0; break;
 			case '{' : r=l<=r?1:0; break;
 			case '}' : r=l>=r?1:0; break;
-			case ']' : r=r<=l && r>=ws[li-1]?1:0; break;
+			case ',' : r=r<=l && r>=ws[li-1]?1:0; break;
 			// flow
 			case ':' : int t=is[ti]; is[ti]=pi; pi=t; break;
 			case ';' : pi=is[ti--]; break;
 			case '.' : pi=is[ti]; break;
-			case '@' : is[++ti]=pi; break;
-			case ',' : ti--; break;
+			case '(' : is[++ti]=pi; break;
+			case ')' : ti--; break;
 			case '!' : pi=eh[(int)r]; li=0; di=0; ti=0; l=0; r=0; break;
 			case '?' : if (r==0) { pi++; } /*sag r=l; if (li > 0) { l=ws[--li]; } */ break;
 			case '\'': r = 0; while (pb[pi++] != '\'') { r <<= 8; r |= pb[pi-1]; }; break;
