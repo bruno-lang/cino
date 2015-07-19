@@ -6,42 +6,47 @@
                      
   a interpreted intermediate language and VM  
 
-              "Hello, World"$
+              "Hello, World".$
 
 Math     Vector    Loop      Flow      Load
-+  add   [         [         :  call   ' <word> '
++  add   .         .         :  call   ' <word> '
 -  sub    + init    . over   ;  ret    " <vect> "
 *  mul    * copy    ! scan   .  goto   0-9 = 'n'
-/  div    : cat     & pair   (  mark   
-\~ mod    , cons    | each   ?  test   Index
-\{ min    ; ins     \ thru   )  break  a-z = (:
-\} max    @ map     / merge  !  raise  A-Z = (
+/  div    : cat     & pair   !  raise   
+%  mod    , cons    | each   ,  ???    Index
+\{ min    ; ins     { thru   {  mark   a-z = {:
+\} max    @ map     } merge  }  break  A-Z = {
 
 Shift    View      Msg       Cmp       Lookup
-\        ]         #         = eq      [    
- < shl    < movel   < rec    < lt       < get
- > shr    > movr    > send   > gt       > set
- \ rol    / take    # pick   { le       { cnt
- / ror    \ drop    ? next   } ge       } find
-          ~ span             , in       ~ match
+\        .         #         == eq     @    
+ < shl    < movel   < rec    <  lt      < get
+ > shr    > movr    > send   >  gt      > set
+ \ rol    \ drop    { pick   =< le      # cnt
+ / ror    / take    } next   => ge      ? find
+          ~ span             =~ in      ~ match
                                  
 Arithm   Bounds    Process   Logic     Misc
-\        ]         #         &  and    $ show 
- + uint   ? len     + spawn  |  or
- - int    [ left    - die    ~  not
- . dec    ] right   & coop   `  xor
- % frac             | fork
-         V-stack   	
-W-stack  [         
-^  dup    ^ vdup   
-_  sag    _ vsag
-%  swap   % vswap   
+$        @         #         &  and    .$ show 
+ + u64    * len     + spawn  |  or
+ - s64    [ left    - die    ~  not    Statics
+ . dec    ] right   & coop   `  xor    ?
+ % frac             | fork              ( ... )
+         V-stack   	                    ) ... (
+W-stack  .                              ? ... \n
+:  dup    : vdup   
+;  par    ; vpar
+,  swap   , vswap   
+_  down   _ vdown
 
-ASCII control codes and whitespace are no-ops.
+ASCII white-space is a no-op. 
 load 2 byte index via first byte with MSB 1.
 a-z, A-Z at start of line mark their target index.
 0-9 at start of line mark exception handler index.
 
-@
+\+ inc (get in a block with min/max)
+\- dec
 
+^ return
 
+quote: []
+can be made available: % 

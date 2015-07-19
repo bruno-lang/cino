@@ -1,0 +1,244 @@
+have a switch that works with blocks
+
+		n[xxx][xxx][xxx].|
+
+- n is the number of blocks to include (in R)
+- n blocks follow
+- `.|` tries them in order on the stack (so in reverse order)
+
+how does a block communicate that it succeeded? 
+otherwise there would need to be 2*n blocks-1 condition for each. gets messy
+
+the guard could be made a part of the statics - each block has one
+
+		n[x?x][x?x][x?x].|
+
+the ? marks the position at which R should be != 0 
+? could be a return saying yes or no - eval could get a boolean result value
+to tell if it was a fulfilled return or not. 
+
+if there is some way to indicate what a test is than a while-do or do-while
+loop becomes quite simple as one just makes a test and a body block. 
+
+- pi should be a local variable in the eval loop => 2byte inst. must be incl.
+- (initial) pi also becomes a parameter to eval, so its from to
+
+- the combination of explicit and implcit control flow gives most oppotunities 
+
+- a function is one line
+- cases are given in sequence of attempt
+- ? is compiled to a conditional jump to the next case, last case has no ?
+- ( is a static marker of the start of the next case,
+- ) is a static marker of the end of a case, is compiled to a unconditional jump to end of function
+- limit is a range of 127 as range of 128-255 is used to encode forward jumps of 1-127
+
+		f(a?x)(b?y)(z)
+
+should even be allowed as 
+
+		f(a?x)(b?y)z
+
+means that conditional jump for last ? is harder to figgure that it has to jump to right after the next ) but smaller programs are worth it. 
+- if a block becomes so long that the jumps would need to be longer parts need to be extratced to blocks. 
+- means there are two types of jumps to a named block:
+	1) just continue at the block start (no nesting and returning)
+	2) nest and return
+  there needs to be a way to encode that on calling a function
+  should be somehow implicit...so that abc is doing a,b and c as a seqeunce
+
+
+this could be reduced even more to use whitespace
+
+		f a?x b?y z
+
+looks nice- more uniform as last case is also a visual block as before. when 
+there is some common initialisation code it becomes
+
+		fi a?x b?y z
+
+only problem: ? is just one byte - how to encode a conditional jump there?
+solution: we wanted 2 cases anyway: jump on zero, jump on not zero
+maybe use the () like that
+
+		fi a?(x)b?)y(z
+
+() and )( are the on 0 or on 1 - but this reads less clear
+
+a test for zero or one should no longer require explicit comparision operators
+e.g. for the fib functions 0 and 1 cases
+
+		f !x ?y z
+
+here using `!` for "is zero then" and ? for "is not zero then". 
+while elegant we need 2 bytes anyway, so
+
+		f ?!x ??y z
+
+this still allows to use the ! for something other instruction. 
+it is just ambigous in the global context before the initialisation phase. 
+than this will be replaced with conditional jumps. 
+in case of the fib the test for ==1 needs to become
+
+
+		f ?!x :1=??y z
+
+so maybe there could be support for two things
+- ?n (n= 0-9) testing for that exact same number
+- ?? testing for not zero
+
+this would work out without problem for 0-8. as 9 is tab the initialisation would
+also need to replace all tabs with spaces in order to be sure that 9 would be
+a jump inserted. but this is no larger problem. 
+
+
+----------
+as long as the java impl actually used recursion on eval method it becomes 
+nasty to implement exception handling as the call stack should be thrown
+away. so by explicitly making a backup and restore of the start/end indexes
+there is no JVM level nesting and a exception can just break flow and continue
+somewhere else. 
+that means to implement a own return stack with start and end index so when 
+end of a block is encountered pi=s, pe=e from stack
+this is back to where this started and it is most like more lightweight-
+but how can one return to the VM callsite than? 
+there we use VM level recusion what is a problem for exceptions. one would need
+to check some flag set when raising an exception and exit the loop to complete
+the expected exception behaviour. ugly because of the performance overhead of
+checking that condition. than this might be essentially free as it is almost
+always passed. 
+
+alternative is to reset the stacks and than throw an exception that is catched
+from entry point and dispatched to handler (if any). This seams the best on JVM. 
+
+
+---------
+
+there are 2 ways of changing the pi.
+A) goto: just setting pi to another value
+B) nest: going there and when the target block ends return to callsite
+
+But the targeted block must be independent of the way it is entered - thus it
+cannot "return" explicitly. It implicitly returns when pi leaves the scope of
+the block. In case of A this is simply the end of the block as if no jump had
+occured. In case of B however the control flow must return to the callsite. 
+The callsite could be a program index (call instruction) or a VM internal
+callsite (loops, vectors). 
+If nesting is implemented with a recursive call to eval this somewhat interfers
+with a manually triggered exception as all the nesting stack within the VM
+would also need to be discarded. 
+that mean in any case the VM has to throw an JVM level exception to implement
+exceptions what clearly makes it more "expensive" and complicated to implement. 
+another way would be to disallow explicit exceptions in quoted blocks whereby
+effectivly these could never throw an exception. this however is against the
+nature of the use cases. clearly a loop can cause trouble converting data.
+On the flipsite there seams to be no other way to implement nesting such that
+it can return to the callsite if that is internal. 
+
+a jump could be encoded as one single letter as the letter is just looked up
+and jumped to. this could eben be replaced with the jump directly as long as
+it is in range 0-127 but as this would be a backwards jump there is no instruction for that yet or room to make unless the available 128 is split into +64/-64 
+this is still quite some code. especially when constants are externalised into globals. 
+assuming that these would than use A-Z this means that these are always logical nests (or call-returns)
+
+--------
+
+some math: if there are 26 namespaces each having 26 possible named positions/
+indexes this are 676 named indexes in total. each of them is compiled to "local"
+relative jumps. if each block gets one named index and is up to 128 long this
+covers 86528 bytes. more than total length of a program. 
+but using 0-127 for relative jumps is quite limiting in the sense that block a
+might want to call b,c and d. this means start of d may still just be 127 bytes
+away from the position in a where earliest jump to d occurs. If such a limit is
+exceeded a new namespace must be used just to escape this limitation. this 
+might turn out to be no problem. it is worth a try. 
+
+maybe gotos should only be encoded throu static markers and realised through
+unconditional relative jumps inserted during initialisation. again this would
+require jumping back.
+but how can one say that a named index is a marker? that e.g. x is meant to
+mark the index it is at and that another occurance of x means to go there.
+somehow it is clear that these are always backwards gotos. like a label.
+the first occurance of a letter is the position to go to, the following are 
+the gotos. but in contrast to blocks that start with a named index and end at
+the end of the line a markers for gotos just appear within functions. 
+maybe one could just reserve xyz for it? 
+
+program
+	namespace A-Z
+		block a-w | label x-z
+			case
+				byte
+
+first try to avoid labels.
+the problem still remains: how to jump backwards? this occurs during recusive calls and also a called block might preceed another one. maybe this is exactly the key. but this would also make cross-calls impossible for no good reason other than compactness and readability. 
+
+is it true that a tail call is literally when puttin the block name at the end of the line?
+so that if that is encountered the replacement would actually be a goto not a nest? I think so. 
+
+
+---------------------------
+
+summary:
+- have a goto-array parallel to the program
+- static replacements for letters use the goto array to hold the jump (relative) or goto(absolute)
+- ?? = is not zero
+- ?0 = is zero
+- ?n = is n
+- a-z = blocks, if block name occurs as last instruction it is a goto/jump otherwise it is nest
+- A-Z = namespaces, occurances always nest
+- marked indexes are replaced with whitespace
+- recursive call is a special instruction that just keeps start and end boundaries. therefore it does not need to know what block it is actually in. 
+
+		f ?0 ?1 :\-f,\-\-f+
+
+this seams clearer and it is equally short in summary. this might be different
+for other functions but its a good trade.
+
+the goto-array can be avoided as long as the jump could be encoded in the 
+available space. The VM has jump instructions for short jumps that fit. 
+Only if those do not work internal instructions will be used that make the jumps.
+These are internal as they use reserved instruction codes that are unspecified
+or illegal to appear in the first place in a program. A VM impl. might use
+these to take care of the modifications made during initialisation. 
+
+problem with the jump buffer is that it does not work well for calls to blocks.
+when the sequence "abc" should be substituted with calls to a, b and c there is
+only one byte space for each of them. an absolute index could not be put there.
+a jumptable for 26x26 is about 2,7KB alone and would require quite some
+index arithmetic each time it is executed. 
+to encode just the start and having the start hold the end would maybe work
+for a-z blocks but absolute jumps to A-Z could be far away. However there are
+only 26 of these so there an indirection could work. Still this is quite unsatifying as it puts arranagement constriants even though the price of the jump array is payed.
+
+
+--------------
+
+Tail-recursion: uses a special recusion instruction that makes pi=ps
+jump out of function at the end of a case: a return instruction
+127-255 are calls to block markers
+
+goal: block length of 255 
+
+----
+
+how 
+
+		f ?0 ?1 :\-f,\-\-f+
+
+is transscribed:
+
+- `?0` => \0 j (j being the relative jump distance 0-255 when not 0)
+- `?1` => \1 j
+- ` ` (space at the end of a case) => (internal) return instruction (making pi=pe or straight out return; can jump any distance)
+- `f` a value between 127 and 255 pointing to a jump-table created on init - this has call semantics
+- `f` (at the beginning of a line) holds the length of f (0-255), the \n can be used to place a return so the function is not entered by accident (although this hints that the main should also be a function with limited scope.
+
+the main loop is the code from the beginning that usually ends with a "return"
+and calls blocks that usually come after the return of the main loop.
+
+- () are free for inc/dec
+
+		f ?0 ?1 :(f,((f+
+
+- {} are also free since control flow does not require them any more
+- have a instruction that takes the Ws and creates an array from it (length and width are topmost and not part of the array created)

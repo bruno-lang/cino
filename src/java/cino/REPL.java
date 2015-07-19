@@ -8,10 +8,11 @@ import java.util.Scanner;
 public class REPL {
 
 	public static void main(String[] args) throws IOException {
-		if (args.length > 0) {
-			VM.run(Files.readAllBytes(Paths.get(args[0])));
-			return;
+		for (int i = 0; i < args.length; i++) {
+			VM.run(Files.readAllBytes(Paths.get(args[i])));
 		}
+		if (args.length > 0)
+			return;
 		Scanner in = new Scanner(System.in);
 		System.out.println("cino v0");
 		while (true) {
