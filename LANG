@@ -13,9 +13,9 @@ _______________________________________________________
 _______________________________________________________
 
 Stack		
-	CS	computing stack [.. L R]
-	RS	return stack 	[.. C]
-	BS	block stack		[.. C]
+	AS	arithmetic stack [.. L R]
+	BS	block stack      [.. B]
+	RS	return stack     [.. C]
 
 Register	
 	R	right (a.k.a top)
@@ -26,40 +26,34 @@ Register
 
 Flags
 	T	test 
-	E	else
 
 Buffer
 	PB	program buffer (array of instruction bytes)
-	NB	named blocks (letter to index in PB)
+	BB	block buffer (a PC via a-z, A-Z)
 
 _______________________________________________________
 
                    Instruction Set
 _______________________________________________________
 
-Tests
-	=	eq		T=L==R, E=f
-	!	neq		T=L!=R, E=f
-	>	gt		T=L>R,  E=f
-	<	lt		T=L<R,  E=f
-
 Arithmetic
-	+	add		t=L+R	[.. L R]	[.. t R]
-	-	sub		t=L-R	[.. L R]	[.. t R]
-	*	mul		t=L*R	[.. L R]	[.. t R]
-	/	div		t=L/R	[.. L R]	[.. t R]
-	%	mod		t=L%R	[.. L R]	[.. t R]
-	_	neg		t=-R	[.. L R]	[.. t R]
-	x	dec		t=R--	[.. L R]	[.. t R]
-	x	inc		t=R++	[.. L R]	[.. t R]
+	+	add		x=L+R	[.. L R]	[.. x R]
+	-	sub		x=L-R	[.. L R]	[.. x R]
+	*	mul		x=L*R	[.. L R]	[.. x R]
+	/	div		x=L/R	[.. L R]	[.. x R]
+	%	mod		x=L%R	[.. L R]	[.. x R]
+	_	neg		x=-R	[.. L R]	[.. x R]
+(maybe...)
+	x	dec		x=R--	[.. L R]	[.. x R]
+	x	inc		x=R++	[.. L R]	[.. x R]
 
 Bitwise
-	&	and		t=L&R	[.. L R]	[.. t R]
-	|	or		t=L|R	[.. L R]	[.. t R]
-	~	inv		t=~R	[.. L R]	[.. t R]
-	^	xor		t=L^R	[.. L R]	[.. t R]
-	´	sal		t=L<<R	[.. L R]	[.. t R]
-	`	sar		t=L>>R	[.. L R]	[.. t R]
+	&	and		x=L&R	[.. L R]	[.. x R]
+	|	or		x=L|R	[.. L R]	[.. x R]
+	~	inv		x=~R	[.. L R]	[.. x R]
+	^	xor		x=L^R	[.. L R]	[.. x R]
+	´	sal		x=L<<R	[.. L R]	[.. x R]
+	`	sar		x=L>>R	[.. L R]	[.. x R]
 
 Loads
 	0	ldc0	R=0		[.. L R]	[.. L 0]
@@ -79,22 +73,29 @@ Stack
 	,	swap			[.. L R]	[.. R L]
 	,,					[.. x L R]	[.. R L x]
 	,,,					[.. x y L R][.. R y L x]
-	:	cut				[.. L R]	[.. R]
-	::					[.. x L R]	[.. L R]
-	:::					[.. x y L R][.. y L R]
+	;	cut				[.. L R]	[.. R]
+	;;					[.. x L R]	[.. L R]
+	;;;					[.. x y L R][.. y L R]
+
+Tests
+	=	eq		T=L==R
+	>	gt		T=L>R
+	<	lt		T=L<R
+	!	not		T=!T
 
 Branching
-	{	if		!(T || E) PC="after next }", E=!T, T=f
-	}	end		E=f
+	{	if		when not T: PC="after }"
+	}	end		T=t
 
 Blocks
-	[	init	B=PC "after ["
-	]	exit	PC=C
-	.n	stn		NB[n]=B		
-	$n	ldn		B=NB[n]
-	@	rcur	PC="after previous ["
-	x	call	CP++, BS[CP]=B, RS[CP]=PC, PC=b
-	a-z		
+	[	def		BS[++B]=PC+1, PC="after next ]"
+	]	ret		PC=RS[C--]
+	@	top		RS[++C]=PC+1, PC=BS[B--]
+	a-z	call	RS[++C]=PC+1, PC=BB[x] (x = a-z, A-Z)
+	A-Z	call	RS[++C]=PC+1, PC=BB[x] (x = a-z, A-Z)
+	:	set x	BB[x]=BS[B--] (x = a-z, A-Z)
+	$	get x	BS[++B]=BB[x] (x = a-z, A-Z)
+
 _______________________________________________________
 
                        Examples
@@ -106,6 +107,9 @@ _______________________________________________________
 	inc		(1+)		dup ldc1 add drop		
 	dec		(1-)		dup ldc1 sub drop		
 	squr	(*)			dup mul drop
+	le		>!			lt not
+	ge		<!			gt not
+	neq		=!			eq not
 
 	rot		,,			[.. x L R]	[.. R L x]
 	flip	, ,,, ,,	[.. x y L R][.. L R x y]
@@ -113,6 +117,44 @@ _______________________________________________________
 	fib		[(1>){(1-)(@,(1-)@+)}]
 	fib2	[(1>){((1-)@,(2-)@+)}]
 
+
+_______________________________________________________
+
+                       Notes
+_______________________________________________________
+
+Initial Rewrite 
+	A program is rewritten once into the internal
+	instruction set in a single pass. 
+	It is expected that the program	might become 
+	shorter or longer. 
+
+Tail Calls
+	Tail calls use the usual `top` instruction `@`. 
+	Unnecessary block nesting simply is not done when
+	`@` is directly followed by the end of a block `]`.
+	This is an optimization within the VM. 
+
+If-Then-Else
+	A if-then-else structure is simply done via:
+
+		test{then}!{else}
+
+	This works as the end always flips T to true when
+	leaving a branch. The negation afterwards will only 
+	evaluate to true when the branch before it wasn't
+	evaluated. 
+	This alternates endlessly when using not `!`:
+
+		test{then}!{else}!{then}!{else}
+
+Logical AND
+	A serious of tests is done as just that
+
+		test1{test2{do}}
+
+Logical OR
+	TODO How?
 
 _______________________________________________________
 
@@ -129,3 +171,14 @@ of 128-255 and 0-31 are internal instructions.
   This also takes care of base 10 vs. base 16. 
 
 * 0-10 equal ldc constant 0-10?
+
+
+_______________________________________________________
+
+                      Problems
+_______________________________________________________
+
+* Or how to do "OR"?
+* How to go back to the start of "this" block? can the 
+  logic be used that this index (at the point of 
+  recursiv calls) should be on top of BS (in B)

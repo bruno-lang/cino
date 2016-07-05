@@ -5,11 +5,17 @@ import static java.lang.Long.rotateRight;
 
 public class VM {
 
+	// new ideas:
+	// vectors have info about their elements (muti-dim-arrays och arrays of records)
+	// functions/blocks should "compose" like the computation does with L and R registers (==> pushing multiple block indexes onto the stack should require explicit stack duplication as with a.-stack)
+	
+	
 	public static void main(String[] args) {
-//		run("[(1>){(1-)(f,(1-)f+)}].f 3f");
-//		run("[(1>){((1-)f,(2-)f+)}].f 7f(2f+)");
+//		run("[(1>){(1-)(f,(1-)f+)}]:f 7f");
+//		run("[(1>){((1-)f,(2-)f+)}]:f 7f(2f+)");
 //		run("2(1<){(3+)}(2+){(1+)}");
-		run("[(1>){(1-)(@,(1-)@+)}] 7z");
+//		run("[(1>){(1-)(@,(1-)@+)}]:f 7f");
+		run("3(2>){(3=){(5+)}}");
 		System.out.println("done");
 	}
 
@@ -35,17 +41,17 @@ public class VM {
 	static final class Process {
 
 		final byte[] pb; int pc;
-		final long[] cs; int lp;
-		final int[]  rs;
-		final int[]  nb;
+		final long[] as; int lp;
 		final int[]  bs;
+		final int[]  rs;
+		final int[]  bb;
 
 		Process(byte[] pb, int stack) {
 			this.pb = pb;
-			this.cs = new long[stack];
+			this.as = new long[stack];
 			this.rs = new  int[stack];
 			this.bs = new  int[stack];
-			this.nb = new int[26];
+			this.bb = new int[127];
 		}
 
 	}
@@ -53,30 +59,30 @@ public class VM {
 	private static final class CPU {
 
 		// stacks
-		long[] cs; int lp; // computing stack; pointer to L (PC is lp+1)
-		int[]  rs, bs; int cp = -1; // return stack; block stack, continue pointer (top on RS, BS)
+		long[] as; int lp; // arithmetic stack; pointer to L (R - top of cs - is lp+1)
+		int[]  rs; int cp = -1; // return stack; continue pointer (top on RS, BS)
+		int[]  bs; int bp = -1; // block stack, block pointer
 		
 		// registers
-		long l;	// left  (next on CS)
-		long r;	// right (top on CS)
-		int  b; // block (a PC index)
-		boolean  t, e;	// test, else
+		long l;	// left  (next on AS)
+		long r;	// right (top on AS)
+		boolean  t;	// test
 
 		// buffers
 		byte[] pb; // program buffer
-		int[]  nb; // name buffer (name to index in PB map)
+		int[]  bb; // block buffer (named blocks to index into PB)
 
 		public void resume(Process p) {
 			// static state (re-reference for better readability in java)
 			pb  = p.pb;
-			nb	= p.nb;
+			bb	= p.bb;
 			// execution state
-			cs = p.cs;
+			as = p.as;
 			rs = p.rs;
 			bs = p.bs;
 			lp = p.lp;
-			l = cs[lp];
-			r = cs[lp+1];
+			l = as[lp];
+			r = as[lp+1];
 
 			resumeAt(p.pc);
 		}
@@ -86,7 +92,7 @@ public class VM {
 			while (pc < pb.length) {
 				printStack();
 				final int i = pb[pc++];
-				System.out.println((char)i);
+				System.out.println(String.format("| %s", String.valueOf((char)i)));
 				switch(i) {
 				// arithmetic
 				case '+' : l+=r; break;
@@ -94,9 +100,9 @@ public class VM {
 				case '*' : l*=r; break;
 				case '/' : l/=r; break;
 				case '%' : l=l%r; break;
-				case '_' : r=-r; break;
-				case 'x' : r++; break;
-				case 'y' : r--; break;
+				case '_' : r=-r; break; // neg 
+				case 'x' : r++; break; // inc (no real symbol yet)
+				case 'y' : r--; break; // dec (no real symbol yet)
 				// bitwise
 				case '&' : l&=r; break;
 				case '|' : l|=r; break;
@@ -105,29 +111,28 @@ public class VM {
 				case '`' : l=rotateRight(l, (int)r); break;
 				case '´' : l=rotateLeft(l, (int)r); break;
 				// tests
-				case '=' : t |= l==r; e=false; break;
-				case '!' : t |= l!=r; e=false; break;
-				case '<' : t |= l<r;  e=false; break;
-				case '>' : t |= l>r;  e=false; break;
+				case '=' : t = l==r; break;
+				case '<' : t = l<r;  break;
+				case '>' : t = l>r;  break;
+				case '!' : t = !t; break;
 				// branching
-				case '{' : if (!(t || e)) { pc = afterNext(pc, '{', '}'); } e=!t; t=false; break;
-				case '}' : e=false; break;
+				case '{' : if (!t) { pc = afterNext(pc, '{', '}'); } break;
+				case '}' : t=true; break;
 				// stack action
-				case '(' : cs[lp++]=l; l=r; break;
-				case ')' : r=l; l= lp < 0 ? 0 : cs[--lp]; break;
-				case ',' : l=l^r; r=l^r; l=l^r; break;
-				case ':' : r=l; lp--; l=cs[lp]; break;
+				case '(' : as[lp++]=l; l=r; break;
+				case ')' : r=l; l= lp < 0 ? 0 : as[--lp]; break;
+				case ',' : l=l^r; r=l^r; l=l^r; break; // swap l/r
+				case ';' : r=l; lp--; l=as[lp]; break; // dup r
 				// no-ops
 				case ' ' :
 				case '\n':
 				case '\r': break;
 				// blocks
-				case '[' : b=pc; pc=afterNext(pc, '[', ']'); break;
+				case '[' : bs[++bp]=pc; pc=afterNext(pc, '[', ']'); break;
 				case ']' : pc=rs[cp--]; break;
-				case '.' : nb[pb[pc++]-'a']=b; break;
-				case '$' : b=nb[pb[pc++]-'a']; break;
-				case '@' : bs[cp+1]=bs[cp]; rs[cp+1]=pc; pc=bs[cp++]; break;
-				case 'z' : bs[++cp]=b; rs[cp]=pc; pc=b; break;
+				case '@' : rs[++cp]=pc; pc=bs[bp]; break; // call and pop top fn on BS
+				case ':' : bb[pb[pc++]]=bs[bp--]; break; // set named index to BS
+				case '$' : bs[++bp]=bb[pb[pc++]]; break; // get named index to BS
 				// vector
 				case '\'':
 					switch (pb[pc++]) {
@@ -140,10 +145,9 @@ public class VM {
 						r=i-'0';
 					} else
 					if (i >= 'a' && i <= 'z') {
-						int bs0 = nb[i-'a'];
 						rs[++cp] = pc;
-						bs[cp] = bs0;
-						pc=bs0;
+						pc=bb[i];
+						bs[++bp] = pc;
 					}
 					else
 						notDefined(' ',i);
@@ -154,9 +158,9 @@ public class VM {
 		}
 
 		private void printStack() {
-			System.out.print(String.format("%s %s | ", t?"t":"f", e?"t":"f"));
+			System.out.print(String.format("%s ", t?"T":" "));
 			for (int i = 0; i < lp; i++) {
-				System.out.print(String.format("%d ", cs[i]));
+				System.out.print(String.format("%d ", as[i]));
 			}
 			System.out.print(String.format("%d %d \t", l, r));
 		}
