@@ -15,7 +15,9 @@ public class VM {
 //		run("[(1>){((1-)f,(2-)f+)}]:f 7f(2f+)");
 //		run("2(1<){(3+)}(2+){(1+)}");
 //		run("[(1>){(1-)(@,(1-)@+)}]:f 7f");
-		run("3(2>){(3=){(5+)}}");
+//		run("3(2>){(3=){(5+)}}");
+		run("3:3<(2<(4<)){+}");
+		
 		System.out.println("done");
 	}
 
@@ -118,9 +120,11 @@ public class VM {
 				// branching
 				case '{' : if (!t) { pc = afterNext(pc, '{', '}'); } break;
 				case '}' : t=true; break;
+				case '(' : if (t) { pc = afterNext(pc, '(', ')'); } break;
+				case ')' : break; // this is a NOOP
 				// stack action
-				case '(' : as[lp++]=l; l=r; break;
-				case ')' : r=l; l= lp < 0 ? 0 : as[--lp]; break;
+				case ':' : as[lp++]=l; l=r; break;
+				case '.' : r=l; l= lp < 0 ? 0 : as[--lp]; break;
 				case ',' : l=l^r; r=l^r; l=l^r; break; // swap l/r
 				case ';' : r=l; lp--; l=as[lp]; break; // dup r
 				// no-ops
@@ -131,10 +135,10 @@ public class VM {
 				case '[' : bs[++bp]=pc; pc=afterNext(pc, '[', ']'); break;
 				case ']' : pc=rs[cp--]; break;
 				case '@' : rs[++cp]=pc; pc=bs[bp]; break; // call and pop top fn on BS
-				case ':' : bb[pb[pc++]]=bs[bp--]; break; // set named index to BS
+				case '\'' : bb[pb[pc++]]=bs[bp--]; break; // set named index to BS
 				case '$' : bs[++bp]=bb[pb[pc++]]; break; // get named index to BS
 				// vector
-				case '\'':
+				case '#':
 					switch (pb[pc++]) {
 					case '*':
 					default: notDefined(' ', i);

@@ -43,9 +43,9 @@ Arithmetic
 	/	div		x=L/R	[.. L R]	[.. x R]
 	%	mod		x=L%R	[.. L R]	[.. x R]
 	_	neg		x=-R	[.. L R]	[.. x R]
-(maybe...)
-	x	dec		x=R--	[.. L R]	[.. x R]
-	x	inc		x=R++	[.. L R]	[.. x R]
+
+	>>	inc		x=R++	[.. L R]	[.. x R]
+	<<	dec		x=R--	[.. L R]	[.. x R]
 
 Bitwise
 	&	and		x=L&R	[.. L R]	[.. x R]
@@ -68,8 +68,8 @@ Loads
 	9	ldc9	R=9		[.. L R]	[.. L 9]
 
 Stack
-	(	dup				[.. L R]	[.. L R R]
-	)	drop			[.. L R]	[.. L]
+	:	dup				[.. L R]	[.. L R R]
+	.	drop			[.. L R]	[.. L]
 	,	swap			[.. L R]	[.. R L]
 	,,					[.. x L R]	[.. R L x]
 	,,,					[.. x y L R][.. R y L x]
@@ -82,10 +82,13 @@ Tests
 	>	gt		T=L>R
 	<	lt		T=L<R
 	!	not		T=!T
+	?	(still available)
 
 Branching
 	{	if		when not T: PC="after }"
 	}	end		T=t
+	(	ifn		when T: PC="after )"
+	) 	endn	(NOOP)
 
 Blocks
 	[	def		BS[++B]=PC+1, PC="after next ]"
@@ -93,29 +96,30 @@ Blocks
 	@	top		RS[++C]=PC+1, PC=BS[B--]
 	a-z	call	RS[++C]=PC+1, PC=BB[x] (x = a-z, A-Z)
 	A-Z	call	RS[++C]=PC+1, PC=BB[x] (x = a-z, A-Z)
-	:	set x	BB[x]=BS[B--] (x = a-z, A-Z)
-	$	get x	BS[++B]=BB[x] (x = a-z, A-Z)
+	'	set x	BB[x]=BS[B--] (x = a-z, A-Z)
 
 _______________________________________________________
 
-                       Examples
+                     Examples
 _______________________________________________________
 
 	abs		0<{_}		ldc0 lt if neg end
 	min		>{,}		gt if swap end
 	max		<{,}		lt if swap end
-	inc		(1+)		dup ldc1 add drop		
-	dec		(1-)		dup ldc1 sub drop		
-	squr	(*)			dup mul drop
-	le		>!			lt not
-	ge		<!			gt not
+	inc		:1+.		dup ldc1 add drop
+	dec		:1-.		dup ldc1 sub drop
+	squr	:*.			dup mul drop
+	le		>!			gt not
+	ge		<!			lt not
 	neq		=!			eq not
 
 	rot		,,			[.. x L R]	[.. R L x]
 	flip	, ,,, ,,	[.. x y L R][.. L R x y]
 
-	fib		[(1>){(1-)(@,(1-)@+)}]
-	fib2	[(1>){((1-)@,(2-)@+)}]
+	fib		[:1>.{:1-.:@,:1-.@+.}]
+	fib2	[:1>.{::1-.@,:2-.@+.}]
+	fib3	[:1>.{<<:@,<<@+.}]
+
 
 
 _______________________________________________________
@@ -128,6 +132,27 @@ Initial Rewrite
 	instruction set in a single pass. 
 	It is expected that the program	might become 
 	shorter or longer. 
+
+Overloaded Instructions
+	It doesn't always make sense to use the same 
+	instruction twice (or even more) directly following
+	each other. This can be used to assign a slightly
+	different meaning to such sequences of two or 
+	more identical instructions. Such sequences are
+	called extended instructions. 
+	Extended instructions are rewritten to internal 
+	instructions during init so they do never appear
+	in a running program. All instructions in running
+	programs are single byte instructions.
+
+Increment-Decrement
+	Due to limitations of the ASCII range there are
+	no direct instructions for increment (++) and
+	decrement (--) but there are overloaded instructions:
+
+		>> is increment (as making the gt test twice 
+		is of no use)
+		<< is decrement (again double lt has no use)
 
 Tail Calls
 	Tail calls use the usual `top` instruction `@`. 
@@ -154,7 +179,19 @@ Logical AND
 		test1{test2{do}}
 
 Logical OR
-	TODO How?
+	A serious of alternatives tests is done with
+	branches that enter when test is false and do not
+	change test when exiting:
+
+		test1(test2(test3)){do}
+
+Loading/Passing Functions
+	To pass a named function as an argument using the
+	block stack it is simply wrapped in another block.
+	The VM can optimize this by using internal 
+	instructions that directly call the wrapped function.
+
+		[a]			=> #a (where # means load fn)
 
 _______________________________________________________
 
@@ -178,7 +215,9 @@ _______________________________________________________
                       Problems
 _______________________________________________________
 
-* Or how to do "OR"?
 * How to go back to the start of "this" block? can the 
   logic be used that this index (at the point of 
-  recursiv calls) should be on top of BS (in B)
+  recursive calls) should be on top of BS (in B)
+
+	[xxx] must be useable to "return" a "function"
+	a-z must be useable to "point to" a "function"
